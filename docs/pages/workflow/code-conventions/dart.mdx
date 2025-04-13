@@ -1,0 +1,563 @@
+# Dart Coding Conventions
+
+This guide outlines our Dart coding standards, based on Google's Dart Style Guide and Flutter recommendations, while maintaining consistency with our TypeScript and other language conventions.
+
+## Naming Conventions
+
+- **camelCase**: Variables, functions, methods, parameters, named parameters
+- **PascalCase**: Classes, enums, extensions, typedefs
+- **snake_case**: Libraries, file names
+- **ALL_CAPS**: Constants
+- **_leadingUnderscore**: Private variables and methods
+
+```dart
+// File name: user_repository.dart
+
+// Class name (PascalCase)
+class UserRepository {
+  // Public property (camelCase)
+  String defaultLocale = 'en_US';
+  
+  // Private property (leading underscore)
+  final _apiClient = ApiClient();
+  
+  // Constant (ALL_CAPS)
+  static const int MAX_CACHE_SIZE = 100;
+  
+  // Method (camelCase)
+  Future<User> getUserById(String id) async {
+    // Variable (camelCase)
+    final response = await _apiClient.get('/users/$id');
+    return User.fromJson(response);
+  }
+  
+  // Private method (leading underscore)
+  void _validateResponse(Map<String, dynamic> response) {
+    // Implementation
+  }
+}
+
+// Enum (PascalCase with camelCase values)
+enum AuthStatus {
+  authenticated,
+  unauthenticated,
+  loading
+}
+
+// Extension (PascalCase)
+extension StringExtension on String {
+  bool get isValidEmail => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(this);
+}
+```
+
+## File Organization
+
+- One class per file for primary classes
+- Snake case for file names
+- Group related smaller classes/utilities in appropriate files
+- Keep implementation files separate from interfaces/abstract classes
+
+```
+lib/
+├── main.dart
+├── src/
+│   ├── app.dart
+│   ├── features/
+│   │   ├── auth/
+│   │   │   ├── data/
+│   │   │   │   ├── auth_repository.dart
+│   │   │   │   └── models/
+│   │   │   │       └── user.dart
+│   │   │   ├── domain/
+│   │   │   │   └── auth_service.dart
+│   │   │   └── presentation/
+│   │   │       ├── screens/
+│   │   │       │   └── login_screen.dart
+│   │   │       └── widgets/
+│   │   │           └── login_form.dart
+│   │   └── home/
+│   │       └── ...
+│   ├── core/
+│   │   ├── utils/
+│   │   │   └── validators.dart
+│   │   └── widgets/
+│   │       └── app_button.dart
+│   └── config/
+│       └── app_config.dart
+└── test/
+    └── features/
+        └── auth/
+            └── auth_repository_test.dart
+```
+
+## Import Statements
+
+- Organize imports in blocks: dart:, package:, relative imports
+- Sort each block alphabetically
+- Use relative imports for files within the same package
+
+```dart
+// Dart SDK imports
+import 'dart:async';
+import 'dart:convert';
+
+// Package imports
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+// Local imports (relative paths)
+import '../models/user.dart';
+import '../utils/validators.dart';
+```
+
+## Classes and Members Order
+
+1. Static variables/constants
+2. Instance variables
+3. Constructors
+4. Static methods
+5. Instance methods
+6. Build method last (for Flutter widgets)
+
+```dart
+class UserProfileScreen extends StatefulWidget {
+  // 1. Static constants
+  static const String routeName = '/profile';
+  
+  // 2. Instance variables
+  final String userId;
+  
+  // 3. Constructors
+  const UserProfileScreen({Key? key, required this.userId}) : super(key: key);
+  
+  // 4. Factory constructor
+  factory UserProfileScreen.fromJson(Map<String, dynamic> json) {
+    return UserProfileScreen(userId: json['id'] as String);
+  }
+  
+  // 5. createState method (required by StatefulWidget)
+  @override
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+class _UserProfileScreenState extends State<UserProfileScreen> {
+  // 1. Static constants
+  static const int _loadingTimeout = 10;
+  
+  // 2. Instance variables
+  late User _user;
+  bool _isLoading = true;
+  
+  // 3. Init and dispose methods
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+  
+  @override
+  void dispose() {
+    // Clean up resources
+    super.dispose();
+  }
+  
+  // 4. Instance methods
+  Future<void> _loadUserData() async {
+    try {
+      final repository = UserRepository();
+      _user = await repository.getUserById(widget.userId);
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      // Handle error
+    }
+  }
+  
+  // 5. Build method (last)
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('User Profile')),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : UserProfileView(user: _user),
+    );
+  }
+}
+```
+
+## Formatting and Style
+
+- Indent with 2 spaces (not tabs)
+- Maximum line length of 80 characters
+- Use trailing commas for multi-line parameter lists to enable better line diffs
+- Place the opening curly brace on the same line for statements
+- For long function calls, put each parameter on its own line
+
+```dart
+// Trailing commas for better diffs
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Settings'),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.refresh),
+          onPressed: _refreshData,
+        ),
+        IconButton(
+          icon: Icon(Icons.info),
+          onPressed: _showInfo,
+        ),
+      ],
+    ),
+    body: ListView(
+      children: [
+        ListTile(
+          title: Text('Notifications'),
+          trailing: Switch(
+            value: _notificationsEnabled,
+            onChanged: _toggleNotifications,
+          ),
+        ),
+        ListTile(
+          title: Text('Theme'),
+          trailing: DropdownButton<String>(
+            value: _selectedTheme,
+            items: _themes.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: _updateTheme,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+```
+
+## Comments and Documentation
+
+- Use `///` for documentation comments (dartdoc)
+- Document all public APIs
+- Use regular `//` comments for implementation notes
+- Add TODOs with issue references as needed
+
+```dart
+/// A service that manages user authentication.
+///
+/// This service handles user login, registration, and session management.
+/// It communicates with the backend API and manages auth tokens.
+class AuthService {
+  final AuthRepository _repository;
+  
+  /// Creates a new [AuthService] with the given [AuthRepository].
+  AuthService(this._repository);
+  
+  /// Authenticates a user with the provided credentials.
+  ///
+  /// Returns a [User] object if authentication is successful.
+  /// Throws an [AuthException] if authentication fails.
+  ///
+  /// Parameters:
+  ///   [email] - The user's email address
+  ///   [password] - The user's password
+  Future<User> login({
+    required String email,
+    required String password,
+  }) async {
+    // Validate inputs
+    if (email.isEmpty || password.isEmpty) {
+      throw AuthException('Email and password cannot be empty');
+    }
+    
+    // TODO(username): Add biometric auth option (HS-123)
+    return await _repository.authenticate(email, password);
+  }
+}
+```
+
+## Null Safety
+
+- Use null safety features (Dart 2.12+)
+- Avoid `!` (null assertion operator) when possible
+- Use `??` (null-aware operator) for defaults
+- Use conditional property access with `?.`
+
+```dart
+// Good - using null safety features appropriately
+void updateUser(User? user) {
+  // Null check with early return
+  if (user == null) return;
+  
+  // Safe property access
+  final userName = user.name;
+  
+  // Default value with ??
+  final displayName = userName.isNotEmpty ? userName : 'Anonymous';
+  
+  // Conditional property access with ?.
+  final isVerified = user.verificationInfo?.isVerified ?? false;
+  
+  // Method calls after null checks, no need for !
+  displayMessage('Updated user: $displayName (Verified: $isVerified)');
+}
+
+// Avoid - excessive use of !
+void updateUserBad(User? user) {
+  // Risky null assertion
+  final userName = user!.name;
+  final isVerified = user.verificationInfo!.isVerified;
+  
+  displayMessage('Updated user: $userName (Verified: $isVerified)');
+}
+```
+
+## Asynchronous Programming
+
+- Use `async`/`await` for asynchronous code
+- Always handle errors in async code
+- Use `Future.wait` for parallel operations
+- Consider using `Stream` for reactive programming
+
+```dart
+// Loading data with proper error handling
+Future<void> loadUserData() async {
+  try {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    
+    // Run multiple async operations in parallel
+    final results = await Future.wait([
+      _userRepository.getProfile(),
+      _settingsRepository.getUserSettings(),
+    ]);
+    
+    final user = results[0] as User;
+    final settings = results[1] as UserSettings;
+    
+    setState(() {
+      _user = user;
+      _settings = settings;
+      _isLoading = false;
+    });
+  } catch (e) {
+    setState(() {
+      _isLoading = false;
+      _error = e.toString();
+    });
+  }
+}
+
+// Using streams for reactive data
+Stream<List<Message>> getMessages(String chatId) {
+  return _firestore
+      .collection('chats')
+      .doc(chatId)
+      .collection('messages')
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .map((snapshot) => snapshot.docs
+          .map((doc) => Message.fromJson(doc.data()))
+          .toList());
+}
+```
+
+## Error Handling
+
+- Use typed exceptions
+- Handle exceptions at appropriate levels
+- Provide meaningful error messages
+- Log errors with sufficient context
+
+```dart
+class ApiException implements Exception {
+  final String message;
+  final int? statusCode;
+  
+  ApiException(this.message, [this.statusCode]);
+  
+  @override
+  String toString() => 'ApiException: $message ${statusCode != null ? '(Status: $statusCode)' : ''}';
+}
+
+Future<User> fetchUser(String id) async {
+  try {
+    final response = await _client.get(Uri.parse('$_baseUrl/users/$id'));
+    
+    if (response.statusCode == 200) {
+      return User.fromJson(jsonDecode(response.body));
+    } else if (response.statusCode == 404) {
+      throw ApiException('User not found', 404);
+    } else {
+      throw ApiException('Failed to load user', response.statusCode);
+    }
+  } on SocketException {
+    throw ApiException('No internet connection');
+  } on TimeoutException {
+    throw ApiException('Connection timeout');
+  } on FormatException {
+    throw ApiException('Invalid response format');
+  } catch (e) {
+    // Log unexpected errors
+    _logger.severe('Unexpected error in fetchUser: $e');
+    throw ApiException('An unexpected error occurred');
+  }
+}
+```
+
+## Testing
+
+- Write unit tests for all business logic
+- Use widget tests for UI components
+- Organize tests to mirror the source structure
+- Use descriptive test names following "given/when/then" pattern
+
+```dart
+void main() {
+  group('AuthService', () {
+    late AuthRepository mockRepository;
+    late AuthService authService;
+    
+    setUp(() {
+      mockRepository = MockAuthRepository();
+      authService = AuthService(mockRepository);
+    });
+    
+    test('login should return user when credentials are valid', () async {
+      // Given
+      const email = 'test@example.com';
+      const password = 'password123';
+      final expectedUser = User(id: '123', email: email);
+      
+      when(mockRepository.authenticate(email, password))
+          .thenAnswer((_) async => expectedUser);
+      
+      // When
+      final result = await authService.login(
+        email: email,
+        password: password,
+      );
+      
+      // Then
+      expect(result, equals(expectedUser));
+      verify(mockRepository.authenticate(email, password)).called(1);
+    });
+    
+    test('login should throw exception when credentials are empty', () async {
+      // Given
+      const email = '';
+      const password = '';
+      
+      // When/Then
+      expect(
+        () => authService.login(email: email, password: password),
+        throwsA(isA<AuthException>()),
+      );
+      
+      verifyNever(mockRepository.authenticate(any, any));
+    });
+  });
+}
+```
+
+## State Management
+
+- Choose an appropriate state management approach (Provider, Riverpod, Bloc, etc.)
+- Keep UI and business logic separate
+- Ensure testability of state management code
+- Document state transitions
+
+```dart
+// Using Riverpod as an example
+class UserNotifier extends StateNotifier<AsyncValue<User>> {
+  final UserRepository _repository;
+  
+  UserNotifier(this._repository) : super(const AsyncValue.loading()) {
+    _loadUser();
+  }
+  
+  Future<void> _loadUser() async {
+    state = const AsyncValue.loading();
+    try {
+      final user = await _repository.getCurrentUser();
+      state = AsyncValue.data(user);
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack);
+    }
+  }
+  
+  Future<void> updateProfile({required String name, String? bio}) async {
+    // Optimistic update
+    final previousState = state;
+    if (previousState is AsyncData<User>) {
+      state = AsyncValue.data(previousState.value.copyWith(
+        name: name,
+        bio: bio ?? previousState.value.bio,
+      ));
+      
+      try {
+        await _repository.updateUserProfile(name: name, bio: bio);
+      } catch (e, stack) {
+        // Revert on failure
+        state = previousState;
+        // Also expose the error
+        state = AsyncValue.error(e, stack);
+      }
+    }
+  }
+}
+```
+
+## Performance Best Practices
+
+- Use `const` constructors when possible
+- Avoid unnecessary rebuilds in Flutter widgets
+- Minimize allocations inside hot loops
+- Use appropriate data structures for operations
+- Profile and optimize render performance
+
+```dart
+// Prefer const widgets for better performance
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Dashboard'),
+      actions: const [
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Icon(Icons.notifications),
+        ),
+      ],
+    ),
+    body: ListView.builder(
+      itemCount: items.length,
+      // Extract item builder to prevent unnecessary rebuilds
+      itemBuilder: (context, index) => _buildItem(items[index]),
+    ),
+  );
+}
+
+// Extracted widget method
+Widget _buildItem(Item item) {
+  return ListTile(
+    leading: CircleAvatar(child: Text(item.initials)),
+    title: Text(item.title),
+    subtitle: Text(item.description),
+  );
+}
+```
+
+## Resources
+
+- [Effective Dart](https://dart.dev/guides/language/effective-dart)
+- [Flutter Style Guide](https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo)
+- [Dart Style Guide](https://dart.dev/guides/language/effective-dart/style)
+
+Remember that these conventions exist to make our codebase more consistent and maintainable. When in doubt, prioritize readability and understandability over rigid adherence to rules.

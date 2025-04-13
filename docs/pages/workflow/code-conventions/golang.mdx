@@ -1,0 +1,354 @@
+# Go Coding Conventions
+
+This guide outlines our Go coding standards, based on Google's Go Style Guide and Effective Go, while maintaining consistency with our other language conventions.
+
+## Naming Conventions
+
+- **MixedCaps/CamelCase**: For exported (public) functions, types, variables, constants
+- **mixedCaps/camelCase**: For unexported (private) functions, types, variables, constants
+- **Abbreviations**: Treat common abbreviations like ID, URL, HTTP as a single word
+
+```go
+// Exported (public) names - start with capital letter
+type UserProfile struct {
+    Username string
+    Email    string
+}
+
+func ValidateUser(user *UserProfile) bool {
+    // Implementation
+}
+
+// Unexported (private) names - start with lowercase
+type userPermission struct {
+    role   string
+    access []string
+}
+
+func validateEmail(email string) bool {
+    // Implementation
+}
+
+// Abbreviations as single words
+var userID string       // Not userId or UserId
+var httpClient *http.Client // Not HTTPClient
+```
+
+## File Organization
+
+- One package per directory
+- Files named after their primary functionality
+- Package names should be short, concise, and reflect directory name
+- Main package for executables, others for libraries
+
+```
+project/
+├── cmd/
+│   └── server/        // Main executable
+│       └── main.go
+├── internal/          // Private packages
+│   ├── auth/
+│   │   ├── auth.go
+│   │   └── token.go
+│   └── models/
+│       └── user.go
+└── pkg/               // Public API packages
+    └── validator/
+        └── email.go
+```
+
+## Code Structure
+
+- Group related constants, variables, and types together
+- Organize imports in blocks: standard library, third-party, project-specific
+- Use empty lines to separate logical sections
+
+```go
+import (
+    "fmt"     // Standard library imports
+    "strings"
+    
+    "github.com/gin-gonic/gin"    // Third-party imports
+    
+    "github.com/hyperscan/project/internal/auth"    // Project imports
+)
+
+// Related constants grouped together
+const (
+    StatusActive   = "active"
+    StatusInactive = "inactive"
+    StatusBanned   = "banned"
+)
+
+// Related types grouped together
+type (
+    User struct {
+        ID    string
+        Email string
+        Name  string
+    }
+    
+    UserRepository interface {
+        FindByID(id string) (*User, error)
+        Save(user *User) error
+    }
+)
+```
+
+## Error Handling
+
+- Check errors immediately after the function call
+- Avoid using `_` to ignore errors unless there's a good reason
+- Use error wrapping to add context (Go 1.13+)
+- Use meaningful error variables or custom error types
+
+```go
+// Good error handling
+file, err := os.Open(filename)
+if err != nil {
+    return fmt.Errorf("failed to open %s: %w", filename, err)
+}
+defer file.Close()
+
+// Custom error types
+type NotFoundError struct {
+    Entity string
+    ID     string
+}
+
+func (e NotFoundError) Error() string {
+    return fmt.Sprintf("%s with ID %s not found", e.Entity, e.ID)
+}
+```
+
+## Functions and Methods
+
+- Keep functions small and focused on a single task
+- Return early for error conditions
+- Group parameters of the same type
+- Use named return values for clarity when appropriate
+
+```go
+// Return early pattern
+func processUser(userID string) (*UserResult, error) {
+    user, err := findUser(userID)
+    if err != nil {
+        return nil, fmt.Errorf("find user: %w", err)
+    }
+    
+    permissions, err := getPermissions(user)
+    if err != nil {
+        return nil, fmt.Errorf("get permissions: %w", err)
+    }
+    
+    // Process with user and permissions...
+    return &UserResult{
+        // ...
+    }, nil
+}
+
+// Named return values
+func splitName(fullName string) (first, last string, ok bool) {
+    parts := strings.Split(fullName, " ")
+    if len(parts) < 2 {
+        return "", "", false
+    }
+    return parts[0], parts[len(parts)-1], true
+}
+```
+
+## Comments and Documentation
+
+- Write comments in complete sentences
+- Begin exported (public) declarations with a doc comment
+- Use `// Package xyz provides...` for package comments
+- Document error returns and panics
+
+```go
+// Package auth provides authentication and authorization functionality.
+package auth
+
+// User represents an authenticated user in the system.
+type User struct {
+    // ...
+}
+
+// Authenticate validates credentials and returns a user object on success.
+// It returns an error if credentials are invalid or if the authentication
+// service is unavailable.
+func Authenticate(username, password string) (*User, error) {
+    // Implementation
+}
+```
+
+## Concurrency
+
+- Use goroutines judiciously
+- Always provide a way to stop concurrent operations
+- Use channels for communication between goroutines
+- Consider sync package utilities (Mutex, WaitGroup, etc.) for simple coordination
+
+```go
+func processItems(items []Item) <-chan Result {
+    results := make(chan Result)
+    
+    go func() {
+        defer close(results)
+        for _, item := range items {
+            // Process item
+            results <- Result{Item: item, Status: "processed"}
+        }
+    }()
+    
+    return results
+}
+
+// Coordinating multiple workers
+func processItemsConcurrently(items []Item, workerCount int) []Result {
+    var wg sync.WaitGroup
+    resultChan := make(chan Result, len(items))
+    
+    // Worker function
+    worker := func(workItems []Item) {
+        defer wg.Done()
+        for _, item := range workItems {
+            // Process item
+            resultChan <- Result{Item: item, Status: "processed"}
+        }
+    }
+    
+    // Distribute work among workers
+    chunkSize := (len(items) + workerCount - 1) / workerCount
+    for i := 0; i < workerCount; i++ {
+        start := i * chunkSize
+        end := start + chunkSize
+        if end > len(items) {
+            end = len(items)
+        }
+        
+        if start < len(items) {
+            wg.Add(1)
+            go worker(items[start:end])
+        }
+    }
+    
+    // Wait and collect results
+    go func() {
+        wg.Wait()
+        close(resultChan)
+    }()
+    
+    var results []Result
+    for r := range resultChan {
+        results = append(results, r)
+    }
+    
+    return results
+}
+```
+
+## Tests
+
+- Use the standard `testing` package
+- Name test functions as `TestXxx` where `Xxx` is the function being tested
+- Use table-driven tests for multiple test cases
+- Use descriptive test failure messages
+
+```go
+func TestCalculateDiscount(t *testing.T) {
+    tests := []struct {
+        name           string
+        total          float64
+        isPremiumUser  bool
+        expectedResult float64
+    }{
+        {
+            name:           "regular customer with small order",
+            total:          50,
+            isPremiumUser:  false,
+            expectedResult: 5.0, // 10% discount
+        },
+        {
+            name:           "premium customer with large order",
+            total:          120,
+            isPremiumUser:  true,
+            expectedResult: 18.0, // 15% discount
+        },
+        // More test cases...
+    }
+    
+    for _, tc := range tests {
+        t.Run(tc.name, func(t *testing.T) {
+            result := CalculateDiscount(tc.total, tc.isPremiumUser)
+            if result != tc.expectedResult {
+                t.Errorf("CalculateDiscount(%f, %t) = %f, want %f",
+                    tc.total, tc.isPremiumUser, result, tc.expectedResult)
+            }
+        })
+    }
+}
+```
+
+## Best Practices
+
+- Prefer composition over inheritance
+- Use interfaces for behavior abstraction
+- Use embedding for struct composition
+- Prefer slices over arrays for dynamic collections
+- Use context for cancellation, timeouts, and request-scoped values
+
+```go
+// Interface for behavior
+type Notifier interface {
+    Notify(message string) error
+}
+
+// Implementations
+type EmailNotifier struct {
+    // Fields
+}
+
+func (e EmailNotifier) Notify(message string) error {
+    // Send email notification
+}
+
+type SMSNotifier struct {
+    // Fields
+}
+
+func (s SMSNotifier) Notify(message string) error {
+    // Send SMS notification
+}
+
+// Composition through embedding
+type Logger struct {
+    Level string
+}
+
+func (l Logger) Log(message string) {
+    // Log implementation
+}
+
+type Service struct {
+    Logger      // Embedded struct
+    notifier Notifier
+    // Other fields
+}
+
+// Now Service has Log method from Logger
+func (s Service) DoSomething() {
+    s.Log("Starting operation") // From embedded Logger
+    // Do work
+    s.notifier.Notify("Operation complete")
+}
+```
+
+## Tooling
+
+- Use `gofmt` or `goimports` for automatic formatting
+- Use `go vet` to detect suspicious code
+- Use `golint` for style checks
+- Use `staticcheck` for additional static analysis
+- Run all tools in CI/CD pipeline
+
+This guide provides a foundation for writing clean, consistent Go code. As with all guidelines, use your judgment and prioritize readability and maintainability.

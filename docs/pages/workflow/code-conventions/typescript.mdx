@@ -1,0 +1,194 @@
+# TypeScript Coding Conventions
+
+This guide outlines our TypeScript coding standards, based on Google and Nimble conventions but simplified for clarity and ease of adoption.
+
+## Naming Conventions
+
+- **PascalCase**: Classes, interfaces, types, enums, decorators
+- **camelCase**: Variables, functions, methods, properties
+- **UPPER_SNAKE_CASE**: Constants, enum values
+- **kebab-case**: File names
+
+```typescript
+// Classes, interfaces, types (PascalCase)
+class UserAccount {}
+interface UserProfile {}
+type UserData = { id: string; name: string };
+
+// Variables, functions (camelCase)
+const userData = getUserProfile();
+function getUserProfile() {}
+
+// Constants (UPPER_SNAKE_CASE)
+const MAX_RETRY_COUNT = 3;
+
+// Enum (PascalCase with UPPER_SNAKE_CASE values)
+enum HttpStatus {
+  OK = 200,
+  NOT_FOUND = 404,
+  SERVER_ERROR = 500
+}
+```
+
+## File Organization
+
+- One class/component per file
+- Use named exports over default exports
+- Group imports by libraries, then internal modules
+- Filename should reflect the primary exported entity
+
+```typescript
+// user-profile.ts
+import React, { useState, useEffect } from 'react'; // External libraries first
+import { format } from 'date-fns';
+
+import { api } from '../services/api'; // Internal imports next
+import { UserData } from '../types';
+
+// Named export matching filename concept
+export function UserProfile() {
+  // ...
+}
+```
+
+## Types and Interfaces
+
+- Prefer interfaces for public APIs, classes, and objects with methods
+- Use types for unions, intersections, and simpler object shapes
+- Add explicit return types to functions
+- Avoid `any` - use `unknown` when type is truly unknown
+
+```typescript
+// Interface for class implementation
+interface UserRepository {
+  findById(id: string): Promise<User>;
+  save(user: User): Promise<void>;
+}
+
+// Type for simple data structure
+type UserPreferences = {
+  theme: 'light' | 'dark';
+  notifications: boolean;
+};
+
+// Function with explicit return type
+function calculateTotal(items: Item[]): number {
+  return items.reduce((sum, item) => sum + item.price, 0);
+}
+```
+
+## Nullability
+
+- Use optional parameters and properties with `?` operator
+- Avoid null assertions (`!`) when possible
+- Use nullish coalescing (`??`) and optional chaining (`?.`)
+
+```typescript
+// Optional properties
+interface User {
+  id: string;
+  name: string;
+  email?: string; // Optional email
+}
+
+// Nullish coalescing and optional chaining
+const displayName = user?.name ?? 'Anonymous';
+```
+
+## Async Code
+
+- Use async/await over raw promises
+- Handle errors with try/catch
+- Avoid nested promises and callback chains
+
+```typescript
+// Preferred approach
+async function loadUserData(userId: string): Promise<UserData> {
+  try {
+    const response = await api.get(`/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to load user data:', error);
+    throw error;
+  }
+}
+```
+
+## Classes and Functions
+
+- Keep functions small and focused
+- Use arrow functions for callbacks and inline functions
+- Make fields readonly when they shouldn't change
+- Use parameter destructuring when applicable
+
+```typescript
+class ShoppingCart {
+  private readonly items: Item[] = [];
+  
+  addItem(item: Item): void {
+    this.items.push(item);
+  }
+  
+  getTotal(): number {
+    return this.items.reduce((sum, item) => sum + item.price, 0);
+  }
+}
+
+// Function with parameter destructuring
+function createUser({ name, email, role = 'user' }: UserCreateParams): User {
+  return {
+    id: generateId(),
+    name,
+    email,
+    role,
+    createdAt: new Date()
+  };
+}
+```
+
+## Comments and Documentation
+
+- Use JSDoc for public APIs
+- Prefer self-documenting code with descriptive names
+- Comment "why" not "what"
+
+```typescript
+/**
+ * Calculates the discount based on order total and user tier.
+ * Premium users get an additional 5% off.
+ */
+function calculateDiscount(total: number, isPremiumUser: boolean): number {
+  const baseDiscount = total > 100 ? 0.1 : 0.05;
+  // Add premium discount if applicable
+  return isPremiumUser ? baseDiscount + 0.05 : baseDiscount;
+}
+```
+
+## Linting and Formatting
+
+- Use ESLint with TypeScript parser
+- Format code with Prettier
+- Run linters in CI/CD pipeline
+
+## Best Practices
+
+- Prefer immutability - use `const`, readonly properties, and avoid mutation
+- Use template literals for string interpolation
+- Avoid complex type assertions
+- Use enums for related constants
+
+```typescript
+// Immutability
+const user = { name: 'John', age: 30 };
+const updatedUser = { ...user, age: 31 }; // Create new object instead of mutating
+
+// Template literals
+const greeting = `Hello, ${user.name}!`;
+
+// Enums for related constants
+enum Permission {
+  READ = 'read',
+  WRITE = 'write',
+  ADMIN = 'admin'
+}
+```

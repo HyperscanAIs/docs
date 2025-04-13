@@ -1,0 +1,107 @@
+# Version Control Guidelines
+
+Effective version control is essential for collaborative development. At Hyperscan, we use Git as our version control system and follow these guidelines to maintain a clean, organized codebase.
+
+## Branching Strategy
+
+We follow a modified GitFlow workflow:
+
+- **main** - Production-ready code
+- **develop** - Integration branch for features
+- **feature/*** - New features and non-emergency bug fixes
+- **release/*** - Release preparation
+- **hotfix/*** - Emergency fixes for production
+
+### Branch Naming Conventions
+
+- **feature/[issue-id]-short-description** (e.g., `feature/HS-123-add-user-authentication`)
+- **hotfix/[issue-id]-short-description** (e.g., `hotfix/HS-456-fix-login-error`)
+- **release/v[version]** (e.g., `release/v1.2.0`)
+
+## Commit Guidelines
+
+### Commit Messages
+
+Follow the conventional commits specification:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+Types:
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation changes
+- **style**: Changes that don't affect code functionality (formatting, etc.)
+- **refactor**: Code changes that neither fix bugs nor add features
+- **perf**: Performance improvements
+- **test**: Adding or correcting tests
+- **chore**: Changes to build process or auxiliary tools
+
+Examples:
+- `feat(auth): implement JWT authentication`
+- `fix(api): resolve null pointer in user controller`
+- `docs: update API documentation`
+
+### Commit Best Practices
+
+- Keep commits atomic and focused on a single change
+- Write clear, concise commit messages (50 characters or less for the subject line)
+- Reference issue IDs in commit messages where applicable
+
+## Pull Request Workflow
+
+1. Create a branch from the appropriate base (usually `develop`)
+2. Make your changes in small, logical commits
+3. Push your branch to the remote repository
+4. Open a pull request with a clear description
+5. Address review feedback
+6. Merge using squash or rebase (as appropriate)
+
+### PR Description Template
+
+```
+## Description
+[A brief description of the changes]
+
+## Related Issues
+[Links to related issues]
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## How Has This Been Tested?
+[Description of testing approach]
+
+## Checklist
+- [ ] My code follows the project's style guidelines
+- [ ] I have performed a self-review of my code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have updated the documentation accordingly
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+```
+
+## Git Best Practices
+
+- Pull and rebase frequently to minimize merge conflicts
+- Use `git rebase` to maintain a clean commit history
+- Never force push to shared branches (e.g., `main`, `develop`)
+- Use interactive rebase to clean up commits before opening a PR
+- Delete branches after they've been merged
+
+## Tagging and Releases
+
+- Tag all releases with semantic versioning (e.g., `v1.2.3`)
+- Create annotated tags with release notes
+- Follow semantic versioning principles (MAJOR.MINOR.PATCH)
+
+Remember that version control history serves as documentation for the project's evolution. Clear commit messages and a clean history make it easier for all team members to understand changes and their purpose.

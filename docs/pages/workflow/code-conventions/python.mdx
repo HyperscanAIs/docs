@@ -1,0 +1,242 @@
+# Python Coding Conventions
+
+This guide outlines our Python coding standards, based on Google and Nimble conventions while maintaining consistency with our TypeScript principles.
+
+## Naming Conventions
+
+- **snake_case**: Functions, variables, methods, modules, packages
+- **PascalCase**: Classes
+- **UPPER_SNAKE_CASE**: Constants
+- **_single_leading_underscore**: Private attributes/methods (by convention)
+- **__double_leading_underscore**: Name mangling in classes
+
+```python
+# Classes (PascalCase)
+class UserAccount:
+    pass
+
+# Functions, variables (snake_case)
+def get_user_profile():
+    pass
+
+user_data = get_user_profile()
+
+# Constants (UPPER_SNAKE_CASE)
+MAX_RETRY_COUNT = 3
+
+# Private by convention (leading underscore)
+class User:
+    def __init__(self, name):
+        self.name = name
+        self._password_hash = None  # Private attribute
+    
+    def _hash_password(self, password):  # Private method
+        pass
+```
+
+## File Organization
+
+- One class per file for larger classes
+- Related smaller classes can be grouped in a single file
+- Group imports in this order:
+  1. Standard library imports
+  2. Related third-party imports
+  3. Local application/library-specific imports
+- Separate import groups with a blank line
+
+```python
+# Standard library
+import os
+import sys
+from datetime import datetime
+
+# Third-party libraries
+import numpy as np
+import pandas as pd
+
+# Local modules
+from app.models import User
+from app.utils.helpers import format_date
+```
+
+## Type Hints
+
+- Use type hints for function parameters and return values
+- Import types from the `typing` module (Python 3.5+) or `collections.abc` (Python 3.9+)
+- Use `Optional` for parameters that could be `None`
+
+```python
+from typing import List, Dict, Optional, Tuple, Union
+
+def get_user_by_id(user_id: str) -> Optional[User]:
+    """Retrieve a user by their ID."""
+    # Implementation
+    return user if user_exists else None
+
+def process_items(items: List[Item]) -> Dict[str, int]:
+    """Process a list of items and return results dictionary."""
+    # Implementation
+    return results
+```
+
+## Docstrings
+
+- Use Google-style docstrings
+- Document parameters, return values, and exceptions
+- Include examples for public APIs
+
+```python
+def calculate_discount(total: float, is_premium_user: bool) -> float:
+    """
+    Calculate the discount based on order total and user tier.
+    
+    Premium users get an additional 5% off.
+    
+    Args:
+        total: The total order amount.
+        is_premium_user: Whether the user has premium status.
+        
+    Returns:
+        The discount rate as a decimal (e.g., 0.1 for 10%).
+        
+    Raises:
+        ValueError: If total is negative.
+    
+    Example:
+        >>> calculate_discount(120, True)
+        0.15
+    """
+    if total < 0:
+        raise ValueError("Total cannot be negative")
+        
+    base_discount = 0.1 if total > 100 else 0.05
+    return base_discount + 0.05 if is_premium_user else base_discount
+```
+
+## Classes and Functions
+
+- Keep functions small and focused
+- Use dataclasses for data containers (Python 3.7+)
+- Follow the Single Responsibility Principle
+- Use property decorators for computed attributes
+- Avoid mutable default arguments
+
+```python
+from dataclasses import dataclass
+from datetime import datetime
+from typing import List, Optional
+
+@dataclass
+class Item:
+    name: str
+    price: float
+    quantity: int = 1
+    
+    @property
+    def total_price(self) -> float:
+        return self.price * self.quantity
+
+class ShoppingCart:
+    def __init__(self):
+        self._items: List[Item] = []
+        
+    def add_item(self, item: Item) -> None:
+        self._items.append(item)
+        
+    def get_total(self) -> float:
+        return sum(item.total_price for item in self._items)
+
+# Avoid mutable default arguments
+def append_to_list(item, target_list=None):  # Good
+    if target_list is None:
+        target_list = []
+    target_list.append(item)
+    return target_list
+
+def append_to_list_bad(item, target_list=[]):  # Bad
+    target_list.append(item)
+    return target_list
+```
+
+## Error Handling
+
+- Use explicit exception handling with specific exception types
+- Provide context in exception messages
+- Use context managers (`with` statements) for resource management
+
+```python
+def read_config_file(file_path: str) -> dict:
+    try:
+        with open(file_path, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Config file not found at {file_path}")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in config file: {e}")
+```
+
+## Code Structure and Style
+
+- Follow PEP 8 for code style
+- Maximum line length of 88 characters (Black formatter default)
+- Use 4 spaces for indentation (never tabs)
+- Prefer list/dict comprehensions over map/filter when appropriate
+- Use f-strings for string interpolation (Python 3.6+)
+
+```python
+# List comprehension
+squares = [x**2 for x in range(10)]
+
+# Dictionary comprehension
+user_scores = {user.id: user.score for user in users}
+
+# F-strings
+name = "World"
+greeting = f"Hello, {name}!"
+
+# Multiline if statements
+if (very_long_condition_1 and 
+        very_long_condition_2 and 
+        very_long_condition_3):
+    do_something()
+```
+
+## Linting and Formatting
+
+- Use Black for code formatting
+- Use Flake8 for linting
+- Use MyPy for type checking
+- Run tools in CI/CD pipeline
+
+## Best Practices
+
+- Write for Python 3.7+ unless backward compatibility is required
+- Use enumeration with `enumerate()` for index access
+- Prefer context managers for resource management
+- Make objects immutable when possible
+- Use generators for large data processing
+- Follow the principle of least surprise
+
+```python
+# Using enumerate
+for i, item in enumerate(items):
+    print(f"Item {i}: {item.name}")
+
+# Context managers
+with open('file.txt', 'r') as f:
+    data = f.read()
+
+# Generators for large data
+def process_large_file(file_path):
+    with open(file_path, 'r') as f:
+        for line in f:
+            yield process_line(line)
+
+# Using immutable types
+from typing import NamedTuple
+
+class UserData(NamedTuple):
+    id: str
+    name: str
+    email: Optional[str] = None
+```

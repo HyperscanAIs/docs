@@ -1,0 +1,100 @@
+# Code Review Guidelines
+
+Code reviews are a critical part of our development process, helping to maintain code quality, share knowledge, and catch issues early. This guide outlines our code review process and best practices.
+
+## Core Principles
+
+- **Technical correctness**: Does the code work as intended?
+- **Code quality**: Is the code well-structured, readable, and maintainable?
+- **Consistency**: Does the code follow our established conventions and patterns?
+- **Security**: Is the code free from vulnerabilities?
+- **Performance**: Is the code efficient?
+
+## The Review Process
+
+### For Code Authors
+
+1. **Keep changes small and focused**
+   - Limit PRs to ~200-400 lines of code when possible
+   - One PR should address one concern or feature
+   - Break large features into smaller, reviewable chunks
+
+2. **Provide context**
+   - Write clear PR descriptions explaining what and why (not just how)
+   - Link to relevant tickets or requirements
+   - Highlight areas where you'd like specific feedback
+
+3. **Self-review**
+   - Review your own diff before requesting reviews
+   - Run tests and linters locally before submitting
+   - Consider annotating your PR with comments to explain complex sections
+
+4. **Be responsive**
+   - Address feedback promptly
+   - If you disagree with feedback, discuss constructively
+
+### For Reviewers
+
+1. **Be timely**
+   - Aim to review PRs within 24 hours of being assigned
+   - For large PRs, acknowledge receipt and provide an ETA
+
+2. **Focus on what matters**
+   - Prioritize correctness, security, and design issues
+   - Don't let style and nit-picks overshadow more important concerns
+   - Remember that perfect is the enemy of good
+
+3. **Be constructive**
+   - Explain why something should be changed
+   - Provide examples or links to relevant documentation
+   - Use phrases like "Consider..." or "What if we..."
+
+4. **Be explicit about expectations**
+   - Clearly indicate if a comment is a blocker or just a suggestion
+   - Use labels like "Nit:" for minor style suggestions
+
+## Review Checklist
+
+### Functionality
+- Does the code work as expected?
+- Are all edge cases handled?
+- Are there appropriate tests?
+- Is error handling comprehensive?
+
+### Code Quality
+- Is the code readable and well-organized?
+- Does it follow DRY (Don't Repeat Yourself) principles?
+- Are functions and methods focused on a single responsibility?
+- Are variable and function names clear and descriptive?
+
+### Security
+- Is user input properly validated and sanitized?
+- Are authentication and authorization implemented correctly?
+- Are there any potential injection vulnerabilities?
+- Is sensitive data handled securely?
+
+### Performance
+- Are there any obvious performance issues?
+- Are database queries optimized?
+- Is caching used appropriately?
+- Could any operations be batched or optimized?
+
+### Documentation
+- Are public APIs documented?
+- Are complex algorithms or business logic explained?
+- Are there comments explaining "why" not just "what"?
+
+## Resolving Disagreements
+
+1. Focus on data and objectives rather than personal preferences
+2. Refer to established guidelines and principles
+3. Consider prototyping alternatives if there's disagreement about approach
+4. If necessary, involve a third team member to provide perspective
+5. Remember that progress is often more important than perfection
+
+## Mindset
+
+Code reviews should be a collaborative learning experience, not just a quality gate. Approach reviews with empathy, knowing that everyone is working toward the same goal of creating excellent software.
+
+Good code reviews lead to better code, increased knowledge sharing, and a stronger team culture.
+
