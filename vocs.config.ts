@@ -18,10 +18,6 @@ export default defineConfig({
       link: "/getting-started",
     },
     {
-      text: "Example",
-      link: "/example",
-    },
-    {
       text: "Developer",
       collapsed: false,
       items: [
