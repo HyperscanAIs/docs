@@ -1,0 +1,200 @@
+# Container Tracking
+
+## Understanding Container Codes
+
+Container codes are unique identifiers assigned to shipping containers. These codes follow the ISO 6346 standard and consist of the following components:
+
+- **Owner Code**: A three-letter prefix identifying the owner of the container (e.g., "MSC").
+- **Equipment Category Identifier**: A single letter indicating the type of container:
+  - **U**: Freight container
+  - **J**: Detachable freight container-related equipment
+  - **Z**: Trailer or chassis
+- **Serial Number**: A six-digit number assigned by the owner.
+- **Check Digit**: A single digit used to validate the container code.
+
+### Example
+For the container code `ABC1234567`:
+- **Owner Code**: `ABC`
+- **Equipment Category Identifier**: `U`
+- **Serial Number**: `123456`
+- **Check Digit**: `7`
+
+This code is used as the **Container ID** in the API for tracking purposes.
+
+Track the location and status of containers in real-time with Hyperscan's container tracking API and SDK.
+
+## Features
+
+- **Real-Time Updates**: Get the latest location and status of containers.
+- **Event Notifications**: Receive alerts for arrivals, departures, and delays.
+- **Historical Data**: Access historical tracking data for analysis.
+- **Geofencing**: Set up geofences to monitor when containers enter or leave specific areas.
+
+## Input
+
+The container tracking API requires the following inputs:
+
+- **Container ID**: A unique identifier for the container.
+- **Tracking Mode** (optional): Specify real-time or historical tracking.
+- **Time Range** (optional): For historical tracking, specify the start and end times.
+- **Geofence Coordinates** (optional): Define geofences for monitoring container movements.
+
+### Example Input (JSON)
+```json
+{
+  "containerId": "C123456789",
+  "trackingMode": "real-time",
+  "geofenceCoordinates": [
+    { "latitude": 37.7749, "longitude": -122.4194 },
+    { "latitude": 34.0522, "longitude": -118.2437 }
+  ]
+}
+```
+
+## Output
+
+The API returns the following details:
+
+- **Current Location**: Latitude and longitude of the container.
+- **Status**: Current status (e.g., in transit, at port, delayed).
+- **Event History**: A list of events such as arrivals, departures, and delays.
+- **Geofence Alerts** (optional): Notifications when the container enters or exits defined geofences.
+
+### Example Output (JSON)
+```json
+{
+  "currentLocation": { "latitude": 37.7749, "longitude": -122.4194 },
+  "status": "in transit",
+  "eventHistory": [
+    { "event": "departed port", "timestamp": "2023-10-01T10:00:00Z" },
+    { "event": "arrived at port", "timestamp": "2023-10-02T15:00:00Z" }
+  ],
+  "geofenceAlerts": ["Entered geofence at 2023-10-02T15:30:00Z"]
+}
+```
+
+## Supported Features
+
+- **Real-Time Tracking**: Monitor container movements in real-time.
+- **Historical Data**: Retrieve past movements and events for analysis.
+- **Geofencing**: Set up geofences to trigger alerts for specific locations.
+- **Event Notifications**: Get notified of key events like arrivals and delays.
+
+## Outcomes
+
+- **Improved Visibility**: Gain real-time insights into container movements.
+- **Operational Efficiency**: Optimize logistics planning with accurate tracking data.
+- **Enhanced Security**: Monitor container movements to prevent theft or loss.
+- **Compliance**: Ensure adherence to shipping regulations with detailed tracking records.
+
+## Disadvantages
+
+- **Dependency on GPS Data**: Requires accurate GPS data for real-time tracking.
+- **Geofence Complexity**: Setting up and managing geofences may require additional effort.
+- **Latency**: Real-time updates may have slight delays depending on network conditions.
+
+## API Examples
+
+### JavaScript
+```javascript
+import { HyperscanClient } from 'hyperscan-js';
+
+const client = new HyperscanClient('your-api-key');
+
+// Track a container
+client.trackContainer({
+  containerId: "C123456789",
+  trackingMode: "real-time",
+  geofenceCoordinates: [
+    { latitude: 37.7749, longitude: -122.4194 },
+    { latitude: 34.0522, longitude: -118.2437 }
+  ]
+}).then(container => {
+  console.log(`Current Location: ${container.currentLocation.latitude}, ${container.currentLocation.longitude}`);
+  console.log(`Status: ${container.status}`);
+  console.log(`Event History: ${JSON.stringify(container.eventHistory)}`);
+  if (container.geofenceAlerts) {
+    console.log(`Geofence Alerts: ${container.geofenceAlerts.join(", ")}`);
+  }
+});
+```
+
+### Python
+```python
+from hyperscan import HyperscanClient
+
+client = HyperscanClient(api_key="your-api-key")
+
+# Track a container
+container = client.track_container(
+    container_id="C123456789",
+    tracking_mode="real-time",
+    geofence_coordinates=[
+        {"latitude": 37.7749, "longitude": -122.4194},
+        {"latitude": 34.0522, "longitude": -118.2437}
+    ]
+)
+print(f"Current Location: {container['currentLocation']['latitude']}, {container['currentLocation']['longitude']}")
+print(f"Status: {container['status']}")
+print(f"Event History: {container['eventHistory']}")
+if "geofenceAlerts" in container:
+    print(f"Geofence Alerts: {', '.join(container['geofenceAlerts'])}")
+```
+
+### Dart
+```dart
+import 'package:hyperscan/hyperscan.dart';
+
+void main() async {
+  final client = HyperscanClient(apiKey: 'your-api-key');
+
+  // Track a container
+  final container = await client.trackContainer(
+    containerId: "C123456789",
+    trackingMode: "real-time",
+    geofenceCoordinates: [
+      {"latitude": 37.7749, "longitude": -122.4194},
+      {"latitude": 34.0522, "longitude": -118.2437},
+    ],
+  );
+  print('Current Location: ${container.currentLocation.latitude}, ${container.currentLocation.longitude}');
+  print('Status: ${container.status}');
+  print('Event History: ${container.eventHistory}');
+  if (container.geofenceAlerts != null) {
+    print('Geofence Alerts: ${container.geofenceAlerts.join(", ")}');
+  }
+}
+```
+
+## SDK Example (Go)
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"hyperscan/sdk"
+)
+
+func main() {
+	client := sdk.NewClient("your-api-key")
+
+	// Track a container
+	container, err := client.TrackContainer("C123456789", sdk.TrackOptions{
+		TrackingMode: "real-time",
+		GeofenceCoordinates: []sdk.Coordinate{
+			{Latitude: 37.7749, Longitude: -122.4194},
+			{Latitude: 34.0522, Longitude: -118.2437},
+		},
+	})
+	if err != nil {
+		log.Fatalf("Error tracking container: %v", err)
+	}
+	fmt.Printf("Current Location: %f, %f\n", container.CurrentLocation.Latitude, container.CurrentLocation.Longitude)
+	fmt.Printf("Status: %s\n", container.Status)
+	fmt.Printf("Event History: %v\n", container.EventHistory)
+	if len(container.GeofenceAlerts) > 0 {
+		fmt.Printf("Geofence Alerts: %v\n", container.GeofenceAlerts)
+	}
+}
+```

@@ -1,0 +1,226 @@
+# Chemical Screening
+
+## Chemical Compatibility Chart
+
+The following chart outlines the compatibility of various hazardous materials for storage and transportation. Use this chart to determine whether materials can be safely stored together.
+
+| Class or Subsidiary Risk         | Flammable Gases | Non-Toxic Non-Flammable Gases | Toxic Gas | Oxidizing Gas | Flammable Liquids | Flammable Solid | Spontaneously Combustible | Dangerous When Wet | Oxidizing Agent | Organic Peroxide |
+|----------------------------------|-----------------|-------------------------------|-----------|---------------|-------------------|----------------|---------------------------|--------------------|-----------------|------------------|
+| **Flammable Gases**              | OK to Store Together | OK to Store Together       | Segregate (At least 3m) | Segregate (At least 3m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 3m) | Isolate |
+| **Non-Toxic Non-Flammable Gases**| OK to Store Together | OK to Store Together       | OK to Store Together    | Segregate (At least 3m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 3m) | Isolate |
+| **Toxic Gas**                    | Segregate (At least 3m) | OK to Store Together     | OK to Store Together    | Check MSDS and Notes    | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 3m) | Isolate |
+| **Oxidizing Gas**                | Segregate (At least 3m) | Segregate (At least 3m)  | Check MSDS and Notes    | OK to Store Together    | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 3m) | Isolate |
+| **Flammable Liquids**            | Segregate (At least 5m) | Segregate (At least 5m)  | Segregate (At least 5m) | Segregate (At least 5m) | OK to Store Together    | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Isolate |
+| **Flammable Solid**              | Segregate (At least 5m) | Segregate (At least 5m)  | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | OK to Store Together    | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Isolate |
+| **Spontaneously Combustible**    | Segregate (At least 5m) | Segregate (At least 5m)  | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | OK to Store Together    | Segregate (At least 5m) | Segregate (At least 5m) | Isolate |
+| **Dangerous When Wet**           | Segregate (At least 5m) | Segregate (At least 5m)  | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | OK to Store Together    | Segregate (At least 5m) | Isolate |
+| **Oxidizing Agent**              | Segregate (At least 3m) | Segregate (At least 3m)  | Segregate (At least 3m) | Segregate (At least 3m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | Segregate (At least 5m) | OK to Store Together    | Isolate |
+| **Organic Peroxide**             | Isolate              | Isolate                   | Isolate                | Isolate              | Isolate                | Isolate                | Isolate                | Isolate                | Isolate                | OK to Store Together |
+
+Identify hazardous materials in cargo and ensure compliance with safety regulations. Hyperscan's chemical screening API leverages AI to detect potential risks, check compatibility, and generate detailed compliance reports.
+
+## Features
+
+- **Hazard Detection**: Detect hazardous chemicals using AI-powered models.
+- **Compatibility Checks**: Verify chemical compatibility based on international safety standards.
+- **Compliance Checks**: Ensure adherence to transportation and storage regulations.
+- **Detailed Reports**: Generate comprehensive screening and compatibility reports.
+- **Batch Screening**: Analyze multiple cargo items in a single request.
+- **Customizable Rules**: Define custom screening rules based on specific business needs.
+
+## Input
+
+The chemical screening API requires the following inputs:
+
+- **Cargo ID**: A unique identifier for the cargo item.
+- **Material Composition**: A list of chemicals or materials present in the cargo.
+- **Weight** (optional): The weight of the cargo for context in screening.
+- **Storage Conditions** (optional): Information about storage conditions (e.g., temperature, humidity).
+- **Custom Rules** (optional): User-defined rules for screening and compatibility checks.
+
+### Example Input (JSON)
+```json
+{
+  "cargoId": "cargo-id-123",
+  "materialComposition": ["flammable gas", "oxidizing agent"],
+  "weight": 1500,
+  "storageConditions": {
+    "temperature": "ambient",
+    "humidity": "low"
+  },
+  "customRules": {
+    "prohibitedCombinations": [
+      { "chemicalA": "flammable gas", "chemicalB": "oxidizing agent" }
+    ],
+    "maxAllowedWeight": 2000
+  }
+}
+```
+
+## Output
+
+The API returns a screening result along with compatibility and compliance details:
+
+- **Screening Result**: Indicates whether the cargo is safe or hazardous.
+- **Detected Hazards**: A list of hazardous materials or conditions identified.
+- **Compatibility Status**: Indicates whether the materials are compatible for storage or transport.
+- **Compliance Status**: Indicates whether the cargo complies with specified regulations.
+- **Warnings** (optional): Any issues or anomalies detected during the screening process.
+
+### Example Output (JSON)
+```json
+{
+  "screeningResult": "hazardous",
+  "detectedHazards": ["flammable gas", "oxidizing agent"],
+  "compatibilityStatus": "incompatible",
+  "complianceStatus": "non-compliant",
+  "warnings": ["Incompatible materials: flammable gas and oxidizing agent"]
+}
+```
+
+## Supported Features
+
+- **Real-Time Screening**: Analyze cargo in real-time for operational efficiency.
+- **Compatibility Checks**: Verify chemical compatibility based on the provided chart.
+- **Batch Processing**: Screen multiple cargo items in a single API call.
+- **Customizable Rules**: Define prohibited combinations, weight limits, and other constraints.
+- **Regulatory Compliance**: Ensure adherence to international safety standards.
+- **Error Handling**: Detect and handle anomalies in input data.
+
+## Chemical Compatibility
+
+The API uses a compatibility matrix to determine whether materials can be stored or transported together. Key compatibility statuses include:
+
+- **OK to Store Together**: Materials are safe to store together.
+- **Segregate**: Materials must be stored separately by a specified distance (e.g., 3m or 5m).
+- **Isolate**: Materials must be completely isolated from each other.
+- **Check MSDS**: Compatibility depends on specific material safety data sheets (MSDS).
+
+### Example Compatibility Check
+If the cargo contains "flammable gas" and "oxidizing agent," the API will return a compatibility status of "incompatible" with a warning to isolate the materials.
+
+## Outcomes
+
+- **Enhanced Safety**: Identify hazardous materials and incompatible combinations to prevent accidents.
+- **Regulatory Compliance**: Avoid fines and legal issues by adhering to safety standards.
+- **Operational Efficiency**: Streamline the screening and compatibility checking process.
+- **Risk Mitigation**: Reduce risks associated with transporting or storing hazardous materials.
+
+## Disadvantages
+
+- **Dependency on Input Data**: Requires accurate material composition and storage condition data for optimal results.
+- **Custom Rule Complexity**: Defining and maintaining custom rules may require additional effort.
+- **Edge Cases**: Uncommon materials or combinations may result in lower confidence scores.
+- **API Latency**: Large-scale batch screening requests may take longer to process.
+
+## API Examples
+
+### JavaScript
+```javascript
+client.screenChemicals({
+  cargoId: "cargo-id-123",
+  materialComposition: ["flammable gas", "oxidizing agent"],
+  storageConditions: {
+    temperature: "ambient",
+    humidity: "low"
+  },
+  customRules: {
+    prohibitedCombinations: [
+      { chemicalA: "flammable gas", chemicalB: "oxidizing agent" }
+    ],
+    maxAllowedWeight: 2000
+  }
+}).then(result => {
+  console.log(`Screening Result: ${result.screeningResult}`);
+  console.log(`Detected Hazards: ${result.detectedHazards.join(", ")}`);
+  console.log(`Compatibility Status: ${result.compatibilityStatus}`);
+  console.log(`Compliance Status: ${result.complianceStatus}`);
+  if (result.warnings) {
+    console.warn(`Warnings: ${result.warnings.join(", ")}`);
+  }
+});
+```
+
+### Python
+```python
+result = client.screen_chemicals(
+    cargo_id="cargo-id-123",
+    material_composition=["flammable gas", "oxidizing agent"],
+    storage_conditions={"temperature": "ambient", "humidity": "low"},
+    custom_rules={
+        "prohibitedCombinations": [
+            {"chemicalA": "flammable gas", "chemicalB": "oxidizing agent"}
+        ],
+        "maxAllowedWeight": 2000
+    }
+)
+print(f"Screening Result: {result['screeningResult']}")
+print(f"Detected Hazards: {', '.join(result['detectedHazards'])}")
+print(f"Compatibility Status: {result['compatibilityStatus']}")
+print(f"Compliance Status: {result['complianceStatus']}")
+if "warnings" in result:
+    print(f"Warnings: {', '.join(result['warnings'])}")
+```
+
+### Dart
+```dart
+final result = await client.screenChemicals(
+  cargoId: "cargo-id-123",
+  materialComposition: ["flammable gas", "oxidizing agent"],
+  storageConditions: {"temperature": "ambient", "humidity": "low"},
+  customRules: {
+    "prohibitedCombinations": [
+      {"chemicalA": "flammable gas", "chemicalB": "oxidizing agent"}
+    ],
+    "maxAllowedWeight": 2000,
+  },
+);
+print('Screening Result: ${result.screeningResult}');
+print('Detected Hazards: ${result.detectedHazards.join(", ")}');
+print('Compatibility Status: ${result.compatibilityStatus}');
+print('Compliance Status: ${result.complianceStatus}');
+if (result.warnings != null) {
+  print('Warnings: ${result.warnings.join(", ")}');
+}
+```
+
+## SDK Example (Go)
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"hyperscan/sdk"
+)
+
+func main() {
+	client := sdk.NewClient("your-api-key")
+
+	// Perform chemical screening
+	screeningResult, err := client.ScreenChemicals(sdk.ChemicalScreeningRequest{
+		CargoID: "cargo-id-123",
+		MaterialComposition: []string{"flammable gas", "oxidizing agent"},
+		StorageConditions: sdk.StorageConditions{
+			Temperature: "ambient",
+			Humidity:    "low",
+		},
+		CustomRules: sdk.CustomRules{
+			ProhibitedCombinations: []sdk.ProhibitedCombination{
+				{ChemicalA: "flammable gas", ChemicalB: "oxidizing agent"},
+			},
+			MaxAllowedWeight: 2000,
+		},
+	})
+	if err != nil {
+		log.Fatalf("Error screening chemicals: %v", err)
+	}
+	fmt.Printf("Screening Result: %s\n", screeningResult.ScreeningResult)
+	fmt.Printf("Detected Hazards: %v\n", screeningResult.DetectedHazards)
+	fmt.Printf("Compatibility Status: %s\n", screeningResult.CompatibilityStatus)
+	fmt.Printf("Compliance Status: %s\n", screeningResult.ComplianceStatus)
+	if len(screeningResult.Warnings) > 0 {
+		fmt.Printf("Warnings: %s\n", screeningResult.Warnings)
+	}
+}
+```

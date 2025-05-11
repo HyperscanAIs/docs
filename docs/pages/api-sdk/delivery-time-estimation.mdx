@@ -1,0 +1,133 @@
+# Delivery Time Estimation
+
+Estimate delivery times based on traffic, distance, and other factors. Hyperscan's delivery time estimation API provides accurate predictions to optimize logistics operations.
+
+## Features
+
+- **Accurate Predictions**: Predict delivery times with high precision.
+- **Real-Time Updates**: Adjust estimates based on live traffic data.
+- **Custom Parameters**: Include factors like weather, vehicle type, and road conditions.
+- **Batch Estimation**: Estimate delivery times for multiple routes in a single request.
+
+## Input
+
+The delivery time estimation API requires the following inputs:
+
+- **Origin**: The starting point of the delivery route.
+- **Destination**: The endpoint of the delivery route.
+- **Waypoints** (optional): A list of intermediate stops along the route.
+- **Vehicle Specifications** (optional): Details such as speed, fuel efficiency, and type.
+- **Traffic Data** (optional): Real-time traffic conditions for the route.
+
+### Example Input (JSON)
+```json
+{
+  "origin": "Warehouse A",
+  "destination": "Customer B",
+  "waypoints": ["Stop 1", "Stop 2"],
+  "vehicle": {
+    "type": "truck",
+    "averageSpeed": 60
+  },
+  "trafficData": {
+    "congestionLevel": "moderate"
+  }
+}
+```
+
+## Output
+
+The API returns the following details:
+
+- **Estimated Time**: The predicted delivery time for the route.
+- **Distance**: The total distance of the route.
+- **Traffic Impact**: The impact of traffic conditions on the estimated time.
+- **Warnings** (optional): Any issues or anomalies detected during the estimation process.
+
+### Example Output (JSON)
+```json
+{
+  "estimatedTime": "2 hours 30 minutes",
+  "distance": "150 km",
+  "trafficImpact": "15 minutes delay due to moderate congestion",
+  "warnings": ["Waypoints not optimized for shortest route"]
+}
+```
+
+## Supported Features
+
+- **Real-Time Traffic Integration**: Incorporates live traffic data to improve accuracy.
+- **Customizable Parameters**: Adjust predictions based on vehicle type, speed, and road conditions.
+- **Batch Processing**: Estimate delivery times for multiple routes simultaneously.
+- **Error Handling**: Detect and handle anomalies in input data.
+
+## Outcomes
+
+- **Improved Planning**: Optimize delivery schedules with accurate time predictions.
+- **Enhanced Customer Satisfaction**: Provide reliable delivery time estimates to customers.
+- **Operational Efficiency**: Reduce delays and improve resource allocation.
+- **Cost Optimization**: Avoid unnecessary fuel consumption and overtime costs.
+
+## Disadvantages
+
+- **Dependency on Traffic Data**: Requires accurate and up-to-date traffic data for optimal results.
+- **Complexity for Multi-Stop Routes**: Estimations for routes with many waypoints may require additional processing time.
+- **Edge Cases**: Unusual road conditions or weather events may reduce prediction accuracy.
+
+## API Examples
+
+### JavaScript
+```javascript
+client.estimateDeliveryTime({
+  origin: "Warehouse A",
+  destination: "Customer B",
+  waypoints: ["Stop 1", "Stop 2"],
+  vehicle: {
+    type: "truck",
+    averageSpeed: 60
+  },
+  trafficData: {
+    congestionLevel: "moderate"
+  }
+}).then(result => {
+  console.log(`Estimated Time: ${result.estimatedTime}`);
+  console.log(`Distance: ${result.distance}`);
+  console.log(`Traffic Impact: ${result.trafficImpact}`);
+  if (result.warnings) {
+    console.warn(`Warnings: ${result.warnings.join(", ")}`);
+  }
+});
+```
+
+### Python
+```python
+result = client.estimate_delivery_time(
+    origin="Warehouse A",
+    destination="Customer B",
+    waypoints=["Stop 1", "Stop 2"],
+    vehicle={"type": "truck", "averageSpeed": 60},
+    traffic_data={"congestionLevel": "moderate"}
+)
+print(f"Estimated Time: {result['estimatedTime']}")
+print(f"Distance: {result['distance']}")
+print(f"Traffic Impact: {result['trafficImpact']}")
+if "warnings" in result:
+    print(f"Warnings: {', '.join(result['warnings'])}")
+```
+
+### Dart
+```dart
+final result = await client.estimateDeliveryTime(
+  origin: "Warehouse A",
+  destination: "Customer B",
+  waypoints: ["Stop 1", "Stop 2"],
+  vehicle: {"type": "truck", "averageSpeed": 60},
+  trafficData: {"congestionLevel": "moderate"},
+);
+print('Estimated Time: ${result.estimatedTime}');
+print('Distance: ${result.distance}');
+print('Traffic Impact: ${result.trafficImpact}');
+if (result.warnings != null) {
+  print('Warnings: ${result.warnings.join(", ")}');
+}
+```

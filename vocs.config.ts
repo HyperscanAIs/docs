@@ -49,7 +49,32 @@ export default defineConfig({
     },
     {
       text: "API & SDK",
-      link: "/business/api-sdk",
+      items: [
+        {
+          text: "API Overview",
+          link: "/api-sdk/overview",
+        },
+        {
+          text: "Container Tracking",
+          link: "/api-sdk/container-tracking",
+        },
+        {
+          text: "Cargo Weight Estimation",
+          link: "/api-sdk/cargo-weight-estimation",
+        },
+        {
+          text: "Chemical Screening",
+          link: "/api-sdk/chemical-screening",
+        },
+        {
+          text: "Route Optimization",
+          link: "/api-sdk/route-optimization",
+        },
+        {
+          text: "Delivery Time Estimation",
+          link: "/api-sdk/delivery-time-estimation",
+        },
+      ],
     },
     {
       text: "Troubleshooting",
